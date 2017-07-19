@@ -39,7 +39,7 @@ namespace Eastwood.Http
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpAction"/> class.
         /// </summary>
-        protected HttpAction()
+        internal HttpAction()
         {
             this.ActionOptions = new HttpActionOptions();
             this.Instrumentation = new EmptyInstrumentationContext();

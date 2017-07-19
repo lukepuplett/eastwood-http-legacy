@@ -15,9 +15,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EastwoodLib", "EastwoodLib\EastwoodLib.csproj", "{7F4A2263-2781-4CC6-A4DF-FBF47B445ABA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EastwoodLib.UnitTests", "EastwoodLib.UnitTests\EastwoodLib.UnitTests.csproj", "{68A7CF78-8A2D-4CA4-8B50-E58AB4867856}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EastwoodLib", "EastwoodLib\EastwoodLib.csproj", "{957A52AE-658A-403A-9175-20BAF1A60898}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,14 +25,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7F4A2263-2781-4CC6-A4DF-FBF47B445ABA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7F4A2263-2781-4CC6-A4DF-FBF47B445ABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7F4A2263-2781-4CC6-A4DF-FBF47B445ABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7F4A2263-2781-4CC6-A4DF-FBF47B445ABA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{68A7CF78-8A2D-4CA4-8B50-E58AB4867856}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{68A7CF78-8A2D-4CA4-8B50-E58AB4867856}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68A7CF78-8A2D-4CA4-8B50-E58AB4867856}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68A7CF78-8A2D-4CA4-8B50-E58AB4867856}.Release|Any CPU.Build.0 = Release|Any CPU
+		{957A52AE-658A-403A-9175-20BAF1A60898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957A52AE-658A-403A-9175-20BAF1A60898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957A52AE-658A-403A-9175-20BAF1A60898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957A52AE-658A-403A-9175-20BAF1A60898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

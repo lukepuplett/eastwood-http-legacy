@@ -47,7 +47,7 @@ namespace Eastwood.Http
             // Set the etag.
 
             string eTag;
-            var rowVersions = items.Select(i => i.RowVersion).ToEnumerable();
+            var rowVersions = items.Select(i => i.RowVersion).ToArray();
 
             if (ETagUtility.TryCreate(rowVersions, out eTag))
             {

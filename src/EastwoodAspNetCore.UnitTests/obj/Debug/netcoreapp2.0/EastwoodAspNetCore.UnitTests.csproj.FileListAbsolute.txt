@@ -1,0 +1,17 @@
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\xunit.runner.utility.netstandard15.dll
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\xunit.runner.reporters.netstandard15.dll
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\Eastwood.AspNetCore.UnitTests.deps.json
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\Eastwood.AspNetCore.UnitTests.runtimeconfig.json
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\Eastwood.AspNetCore.UnitTests.runtimeconfig.dev.json
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\Eastwood.AspNetCore.UnitTests.dll
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\Eastwood.AspNetCore.UnitTests.pdb
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\Eastwood.Http.AspNetCore.dll
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\Eastwood.Http.AspNetCore.pdb
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\obj\Debug\netcoreapp2.0\EastwoodAspNetCore.UnitTests.csprojResolveAssemblyReference.cache
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\obj\Debug\netcoreapp2.0\EastwoodAspNetCore.UnitTests.csproj.CoreCompileInputs.cache
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\obj\Debug\netcoreapp2.0\EastwoodAspNetCore.UnitTests.AssemblyInfoInputs.cache
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\obj\Debug\netcoreapp2.0\EastwoodAspNetCore.UnitTests.AssemblyInfo.cs
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\obj\Debug\netcoreapp2.0\Eastwood.AspNetCore.UnitTests.dll
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\obj\Debug\netcoreapp2.0\Eastwood.AspNetCore.UnitTests.pdb
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore.UnitTests\bin\Debug\netcoreapp2.0\Eastwood.Http.AspNetCore.xml

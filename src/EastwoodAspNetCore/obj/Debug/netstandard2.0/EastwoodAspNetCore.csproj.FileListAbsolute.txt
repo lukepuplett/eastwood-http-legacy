@@ -1,0 +1,10 @@
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore\bin\Debug\netstandard2.0\Eastwood.Http.AspNetCore.deps.json
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore\bin\Debug\netstandard2.0\Eastwood.Http.AspNetCore.dll
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore\bin\Debug\netstandard2.0\Eastwood.Http.AspNetCore.pdb
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore\obj\Debug\netstandard2.0\EastwoodAspNetCore.csprojResolveAssemblyReference.cache
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore\obj\Debug\netstandard2.0\EastwoodAspNetCore.csproj.CoreCompileInputs.cache
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore\obj\Debug\netstandard2.0\EastwoodAspNetCore.AssemblyInfoInputs.cache
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore\obj\Debug\netstandard2.0\EastwoodAspNetCore.AssemblyInfo.cs
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore\obj\Debug\netstandard2.0\Eastwood.Http.AspNetCore.dll
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore\obj\Debug\netstandard2.0\Eastwood.Http.AspNetCore.pdb
+C:\DATA\Git\_Eastwood\src\EastwoodAspNetCore\bin\Debug\netstandard2.0\Eastwood.Http.AspNetCore.xml

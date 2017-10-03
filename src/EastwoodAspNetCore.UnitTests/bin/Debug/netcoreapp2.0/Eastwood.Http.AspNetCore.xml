@@ -1,0 +1,511 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Eastwood.Http.AspNetCore</name>
+    </assembly>
+    <members>
+        <member name="T:Eastwood.Binary.BitHelper">
+            <summary>
+            A true grafter in the library, this class generally helps out and mucks in with bit wrangling duties.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Binary.BitHelper.ConvertToBigInteger(System.Collections.BitArray)">
+            <summary>
+            Converts a BitArray to a BigInteger.
+            </summary>
+            <param name="bits">The bits.</param>
+            <returns>BigInteger.</returns>
+            <exception cref="T:System.ArgumentNullException">bits</exception>
+        </member>
+        <member name="M:Eastwood.Binary.BitHelper.ConvertToBytes(System.Collections.BitArray)">
+            <summary>
+            Returns all the bits as a byte array.
+            </summary>
+            <returns>An array of bytes</returns>
+        </member>
+        <member name="M:Eastwood.Binary.BitHelper.ConvertToHex(System.Byte[])">
+            <summary>
+            Turns a byte array into its Hex representation.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Binary.BitHelper.ConvertToHex(System.Collections.BitArray)">
+            <summary>
+            Converts a BitArray to hexadecimal.
+            </summary>
+            <param name="bits">The bits.</param>
+            <returns>System.String.</returns>
+            <exception cref="T:System.ArgumentNullException">bits</exception>
+        </member>
+        <member name="M:Eastwood.Binary.BitHelper.ConvertToHex(System.DateTimeOffset)">
+            <summary>
+            Converts a DateTimeOffset to a hexadecimal representation.
+            </summary>
+            <param name="timestamp">The timestamp.</param>
+            <returns>System.String.</returns>
+        </member>
+        <member name="M:Eastwood.Binary.BitHelper.ConvertToBytes(System.DateTimeOffset)">
+            <summary>
+            Converts a DateTimeOffset to a byte array.
+            </summary>
+            <param name="timestamp">The timestamp.</param>
+            <returns>System.Byte[].</returns>
+        </member>
+        <member name="M:Eastwood.EastAspNetCore_MvcExtensions.ExecuteWithAsync(Microsoft.AspNetCore.Mvc.ActionContext,System.Int32)">
+            <summary>
+            Responds to the request and executes the action..
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="statusCode">The status code.</param>
+            <param name="content">The content.</param>
+            <returns>A new HttpResponseMessage</returns>
+        </member>
+        <member name="M:Eastwood.EastAspNetCore_MvcExtensions.ExecuteWithAsync``1(Microsoft.AspNetCore.Mvc.ActionContext,System.Int32,``0)">
+            <summary>
+            Responds to the request and executes the action..
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="statusCode">The status code.</param>
+            <param name="content">The content.</param>
+            <returns>A new HttpResponseMessage</returns>
+        </member>
+        <member name="M:Eastwood.EastAspNetCore_MvcExtensions.ExecuteWithAsync(Microsoft.AspNetCore.Mvc.ActionContext,System.Int32,System.String,System.String)">
+            <summary>
+            Responds to the request and executes the action.
+            </summary>
+            <param name="statusCode">The status code.</param>
+            <param name="message">The message.</param>
+            <returns>HttpResponseMessage.</returns>
+        </member>
+        <member name="M:Eastwood.EastAspNetCore_MvcExtensions.ExecuteWithAsync(Microsoft.AspNetCore.Mvc.ActionContext,System.Int32,Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary)">
+            <summary>
+            Responds to the request and executes the action.
+            </summary>
+            <param name="statusCode">The status code.</param>
+            <param name="modelState">State of the model.</param>
+            <returns>HttpResponseMessage.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:Eastwood.EastAspNetCore_MvcExtensions.ExecuteWithAsync(Microsoft.AspNetCore.Mvc.ActionContext,System.Int32,Microsoft.AspNetCore.Mvc.SerializableError)">
+            <summary>
+            Responds to the request and executes the action.
+            </summary>
+            <param name="statusCode">The status code.</param>
+            <param name="error">The error.</param>
+            <returns>HttpResponseMessage.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:Eastwood.EastAspNetCore_MvcExtensions.ExecuteWithAsync(Microsoft.AspNetCore.Mvc.ActionContext,System.Int32,System.Exception)">
+            <summary>
+            Responds to the request and executes the action.
+            </summary>
+            <param name="statusCode">The status code.</param>
+            <param name="exception">The exception.</param>
+            <returns>HttpResponseMessage.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:Eastwood.EastAspNetCore_MvcExtensions.ApplyVersionHeaders(Microsoft.AspNetCore.Mvc.ActionContext,System.Collections.Generic.IEnumerable{Eastwood.Http.IPreconditionInformation})">
+            <summary>
+            Applies version headers based on information in the supplied content.
+            </summary>
+            <param name="versionableContentItems">The precondition information.</param>
+        </member>
+        <member name="M:Eastwood.EastAspNetCore_MvcExtensions.ApplyVersionHeaders(Microsoft.AspNetCore.Mvc.ActionContext,Eastwood.Http.IPreconditionInformation)">
+            <summary>
+            Applies version headers based on information in the supplied content.
+            </summary>
+        </member>
+        <member name="T:Eastwood.Http.AggregatePreconditionInformation">
+            <summary>
+            Represents the aggregate of a collection of precondition information.
+            </summary>
+            <remarks>
+            This class is used to create versioning data from a set of versionable items.
+            </remarks>
+        </member>
+        <member name="P:Eastwood.Http.AggregatePreconditionInformation.ModifiedOn">
+            <summary>
+            Gets or sets the modified on.
+            </summary>
+            <value>
+            The modified on.
+            </value>
+        </member>
+        <member name="P:Eastwood.Http.AggregatePreconditionInformation.RowVersion">
+            <summary>
+            Gets or sets the row version.
+            </summary>
+            <value>
+            The row version.
+            </value>
+        </member>
+        <member name="M:Eastwood.Http.AggregatePreconditionInformation.CreateFrom(System.Collections.Generic.IEnumerable{Eastwood.Http.IPreconditionInformation})">
+            <summary>
+            Creates aggregated precondition information from a collection of precondition information.
+            </summary>
+            <param name="items">The items.</param>        
+            <exception cref="T:System.ArgumentNullException">items</exception>
+        </member>
+        <member name="M:Eastwood.Http.AggregatePreconditionInformation.CreateFrom(System.Collections.Generic.IEnumerable{System.DateTimeOffset})">
+            <summary>
+            Creates aggregated precondition information from a collection of timestamps.
+            </summary>
+            <param name="timeStamps">The time stamps.</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException">timeStamps</exception>
+            <exception cref="T:System.InvalidOperationException">Cannot create precondition information from the timestamps. This is unexpected as it is assumed that it is always possible.</exception>
+        </member>
+        <member name="T:Eastwood.Http.EmptyInstrumentationContext">
+            <summary>
+            A default instrumentation context that contains methods that do nothing or as little as possible.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.EmptyInstrumentationContext.GetLogger(System.String)">
+            <summary>
+            Gets a comprehensive delegate through which to write log messages.
+            </summary>
+            <param name="name">The name of the logger.</param>
+            <returns>
+            A delegate taking the event type, the category number, the object or message to log, any exception and an exception text formatter function.
+            </returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:Eastwood.Http.EmptyInstrumentationContext.FormatMessage(System.Object,System.Exception)">
+            <summary>
+            Formats an exception for tracing.
+            </summary>
+            <param name="data">The data.</param>
+            <param name="exception">The exception.</param>
+            <returns>Formatted error text.</returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:Eastwood.Http.ETagUtility.TryConvertToBytes(System.String,System.Byte[]@)">
+            <summary>
+            Tries to convert a hexadecimal or base-64 ETag to bytes.
+            </summary>
+            <param name="tagString">The tag string suspected to be hex or base-64.</param>
+            <param name="bytes">The bytes.</param>
+            <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="T:Eastwood.Http.HttpAction">
+            <summary>
+            Encapsulates the work to perform an HTTP action upon a resource.
+            </summary>
+            <remarks>
+            <para>
+            The HttpAction forms the primary class of the Eastwood™ ASP.NET MVC action mini-framework.
+            </para>
+            <para>
+            First, a fast-acting TryGetLocalConditionInfoAsync method is called, which seeks out any versioning 
+            information stored on the server, before any preconditions are checked and if met, a powerful second 
+            ExecuteActionAsync mechanism comes into play to drive the action home.
+            </para>
+            <para>
+            See how this ground-breaking new design is transforming ASP.NET MVC web projects today.
+            </para>
+            </remarks>
+            <seealso cref="!:System.Web.Http.IHttpActionResult" />
+        </member>
+        <member name="M:Eastwood.Http.HttpAction.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Eastwood.Http.HttpAction"/> class.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.HttpAction.#ctor(Eastwood.Http.HttpActionInitializationContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Eastwood.Http.HttpAction"/> class.
+            </summary>
+            <param name="initializationContext">The initialization context.</param>
+            <exception cref="T:System.ArgumentNullException">initializationContext</exception>
+        </member>
+        <member name="P:Eastwood.Http.HttpAction.ActionOptions">
+            <summary>
+            Gets the action options.
+            </summary>
+        </member>
+        <member name="P:Eastwood.Http.HttpAction.Instrumentation">
+            <summary>
+            Gets the instrumentation.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.HttpAction.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
+            <summary>
+            Called by the WebAPI framework to execute the action and get a response.
+            </summary>
+            <param name="actionContext"></param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>
+            A task that, when completed, contains the <see cref="T:System.Net.Http.HttpResponseMessage" />.
+            </returns>
+        </member>
+        <member name="M:Eastwood.Http.HttpAction.TryGetLocalConditionInfoAsync(Microsoft.AspNetCore.Mvc.ActionContext,System.Threading.CancellationToken)">
+            <summary>
+            Tries to get optional information about the local resource for use when evaluating preconditions in the request.
+            </summary>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>An attempt object that may or may not contain local information.</returns>
+        </member>
+        <member name="M:Eastwood.Http.HttpAction.ExecuteActionAsync(Microsoft.AspNetCore.Mvc.ActionContext,System.Threading.CancellationToken)">
+            <summary>
+            Called by the base HttpAction after any preconditions have been checked to enact the action and get a response.
+            </summary>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Eastwood.Http.HttpAction.Log(System.Diagnostics.TraceEventType,System.Object,System.Exception)">
+            <summary>
+            Logs a message to the logging implementation.
+            </summary>
+            <param name="eventType">Type of the event.</param>
+            <param name="message">The message.</param>
+        </member>
+        <member name="T:Eastwood.Http.HttpActionInitializationContext">
+            <summary>
+            Contains information for the initialization of an <see cref="T:Eastwood.Http.HttpAction"/>.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.HttpActionInitializationContext.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Eastwood.Http.HttpActionInitializationContext"/> class.
+            </summary>
+            <param name="actionContext">The action context.</param>
+        </member>
+        <member name="P:Eastwood.Http.HttpActionInitializationContext.ActionOptions">
+            <summary>
+            Gets the action options.
+            </summary>
+        </member>
+        <member name="P:Eastwood.Http.HttpActionInitializationContext.Instrumentation">
+            <summary>
+            Gets the instrumentation context.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.HttpActionOptions.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Eastwood.Http.HttpActionOptions"/> class.
+            </summary>
+        </member>
+        <member name="P:Eastwood.Http.HttpActionOptions.EnableInvalidModelStateResponder">
+            <summary>
+            Gets or sets a value indicating whether automatic invalid model state responding should be enabled|disabled.
+            </summary>
+        </member>
+        <member name="P:Eastwood.Http.HttpActionOptions.InvalidModelStatus">
+            <summary>
+            Gets or sets the status to respond with if the model state is invalid.
+            </summary>
+        </member>
+        <member name="P:Eastwood.Http.HttpActionOptions.EnablePreconditionResponder">
+            <summary>
+            Gets or sets a value indicating whether automatically responding to preconditions should be enabled|disabled.
+            </summary>
+        </member>
+        <member name="P:Eastwood.Http.HttpActionOptions.MissingPreconditionResult">
+            <summary>
+            Gets or sets the behaviour if a precondition cannot be determined usually due to a lack of information on the request.
+            </summary>
+        </member>
+        <member name="T:Eastwood.Http.HttpPreconditionBuilder">
+            <summary>
+            Builds precondition checking logic for a request that can be called later when required information is available.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.HttpPreconditionBuilder.#ctor(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Eastwood.Http.HttpPreconditionBuilder" /> class.
+            </summary>
+            <param name="httpContext">The HTTP context.</param>
+            <exception cref="T:System.ArgumentNullException">request</exception>
+        </member>
+        <member name="P:Eastwood.Http.HttpPreconditionBuilder.PreconditionExecutor">
+            <summary>
+            Gets or sets the precondition executor.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.HttpPreconditionBuilder.IsMutatingMethod(System.String)">
+            <summary>
+            Determines whether the specified HTTP method name is changes server-side state.
+            </summary>
+            <param name="httpMethodName">Name of the HTTP method.</param>
+        </member>
+        <member name="M:Eastwood.Http.HttpPreconditionBuilder.DefaultPreconditionResultForMethod(System.String)">
+            <summary>
+            Determines the best default precondition behavior for the HTTP method.
+            </summary>
+            <remarks>
+            The default implementation states that all reads will pass and all mutatative methods will fail.
+            </remarks>
+            <param name="httpMethod">The HTTP method.</param>
+            <returns>A behavior</returns>
+            <exception cref="T:System.ArgumentNullException">httpMethod</exception>
+        </member>
+        <member name="M:Eastwood.Http.HttpPreconditionBuilder.BuildPrecondition(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Builds a precondition, choosing the appropriate default response for the HTTP method in the request.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.HttpPreconditionBuilder.BuildPrecondition(Microsoft.AspNetCore.Http.HttpRequest,Eastwood.Http.PreconditionResult)">
+            <summary>
+            Builds a precondition.
+            </summary>
+            <param name="defaultResult">The default result should the requisite headers not be present; usually a reads should pass and writes should fail.</param>
+            <exception cref="T:System.InvalidOperationException">Cannot execute method. The required property Request is a null reference.</exception>
+            <exception cref="T:System.NotSupportedException">Unable to build a predicate for the request. The HTTP method is not supported.</exception>
+        </member>
+        <member name="T:Eastwood.Http.HttpPreconditionExecutor">
+            <summary>
+            Executes the preconditional request checking logic.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.HttpPreconditionExecutor.GetResult(Microsoft.AspNetCore.Http.HttpRequest,Eastwood.Http.PreconditionResult,Eastwood.Http.IPreconditionInformation)">
+            <summary>
+            Executes the precondition and returns the result.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="defaultResult">The default result.</param>
+            <param name="localInformation">The local information.</param>
+            <returns>PreconditionResult.</returns>
+        </member>
+        <member name="M:Eastwood.Http.HttpPreconditionExecutor.GetResultForNonMutating(Microsoft.AspNetCore.Http.HttpRequest,Eastwood.Http.PreconditionResult,Eastwood.Http.IPreconditionInformation)">
+            <summary>
+            Gets the result for a HTTP method that doesn't change server side state.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="defaultResult">The default result.</param>
+            <param name="localInformation">The local information.</param>
+            <returns>PreconditionResult.</returns>
+        </member>
+        <member name="M:Eastwood.Http.HttpPreconditionExecutor.GetResultForMutating(Microsoft.AspNetCore.Http.HttpRequest,Eastwood.Http.PreconditionResult,Eastwood.Http.IPreconditionInformation)">
+            <summary>
+            Gets the result for a HTTP method that changes server side state.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="defaultResult">The default result.</param>
+            <param name="localInformation">The server side information.</param>
+            <returns>PreconditionResult.</returns>
+            <exception cref="T:System.NotSupportedException">
+            The wildcard ETag conditional PUT|DELETE is not supported.
+            or
+            The wildcard ETag conditional PUT|DELETE is not supported.
+            </exception>
+        </member>
+        <member name="T:Eastwood.Http.InstrumentationContext">
+            <summary>
+            Provides access to features for collecting application metrics and diagnostics, uh ha.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.InstrumentationContext.GetLogger(System.String)">
+            <summary>
+            Gets a comprehensive delegate through which to write log messages.
+            </summary>
+            <param name="name">The name of the logger.</param>
+            <returns>A delegate taking the event type, the category number, the object or message to log, any exception and an exception text formatter function.</returns>
+        </member>
+        <member name="M:Eastwood.Http.InstrumentationContext.FormatMessage(System.Object,System.Exception)">
+            <summary>
+            Formats an exception for tracing.
+            </summary>
+            <param name="Object">Associated object data.</param>
+            <param name="Exception">The exception.</param>
+            <returns>Formatted error text.</returns>
+        </member>
+        <member name="T:Eastwood.Http.IPreconditionInformation">
+            <summary>
+            Types implementing this interface have information used for evaluating HTTP method preconditions.
+            </summary>
+        </member>
+        <member name="T:Eastwood.Http.PreconditionResult">
+            <summary>
+            Holds the result of a precondition test. This class cannot be inherited.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.PreconditionResult.#ctor(System.Int32,System.String,Eastwood.Http.PreconditionResultStatus)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Eastwood.Http.PreconditionResult"/> class.
+            </summary>
+            <param name="statusCode">The status code.</param>
+            <param name="reasonPhrase">The reason phrase.</param>
+            <param name="status">The status.</param>
+        </member>
+        <member name="F:Eastwood.Http.PreconditionResult.PreconditionPassed">
+            <summary>
+            A standard result to indicate that the precondition passed and that server-side execution should continue.
+            </summary>
+        </member>
+        <member name="F:Eastwood.Http.PreconditionResult.PreconditionFailed">
+            <summary>
+            A standard result to indicate a 412 Precondition Failed response should be given.
+            </summary>
+        </member>
+        <member name="F:Eastwood.Http.PreconditionResult.PreconditionFailedNotModified">
+            <summary>
+            A standard result to indicate a 304 Not Modified should be given.
+            </summary>
+        </member>
+        <member name="F:Eastwood.Http.PreconditionResult.PreconditionRequired">
+            <summary>
+            A standard result to indicate a 428 precondition required response should be given.
+            </summary>
+        </member>
+        <member name="F:Eastwood.Http.PreconditionResult.BadRequest">
+            <summary>
+            A standard result to indicate a 400 bad request response should be given.
+            </summary>
+        </member>
+        <member name="T:Eastwood.Http.PreconditionResultStatus">
+            <summary>
+            The various statuses of a precondition check.
+            </summary>
+        </member>
+        <member name="F:Eastwood.Http.PreconditionResultStatus.Indeterminable">
+            <summary>
+            Unable to determine the precondition, usually due to missing information in the request.
+            </summary>
+        </member>
+        <member name="F:Eastwood.Http.PreconditionResultStatus.Passed">
+            <summary>
+            The conditions on the request passed.
+            </summary>
+        </member>
+        <member name="F:Eastwood.Http.PreconditionResultStatus.Failed">
+            <summary>
+            The conditions on the request were not met.
+            </summary>
+        </member>
+        <member name="T:Eastwood.Http.UnexpectedHttpMethodException">
+            <summary>
+            Represents a situation where execution should not continue because a request has an unexpected or unrecognised HTTP method.
+            </summary>
+            <seealso cref="T:System.ApplicationException" />
+        </member>
+        <member name="M:Eastwood.Http.UnexpectedHttpMethodException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Eastwood.Http.UnexpectedHttpMethodException"/> class.
+            </summary>
+        </member>
+        <member name="M:Eastwood.Http.UnexpectedHttpMethodException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Eastwood.Http.UnexpectedHttpMethodException"/> class.
+            </summary>
+            <param name="message">A message that describes the error.</param>
+        </member>
+        <member name="M:Eastwood.Http.UnexpectedHttpMethodException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Eastwood.Http.UnexpectedHttpMethodException"/> class.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="inner">The inner.</param>
+        </member>
+        <member name="M:Eastwood.Http.UnexpectedHttpMethodException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Eastwood.Http.UnexpectedHttpMethodException"/> class.
+            </summary>
+            <param name="info">The object that holds the serialized object data.</param>
+            <param name="context">The contextual information about the source or destination.</param>
+        </member>
+        <member name="T:Eastwood.Mapping.IRowVersion">
+            <summary>
+            Types implementing this interfaces are normally data entities which have some entropy that is mutated upon storage write.
+            </summary>
+        </member>
+    </members>
+</doc>

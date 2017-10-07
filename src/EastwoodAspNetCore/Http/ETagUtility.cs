@@ -111,6 +111,20 @@ namespace Eastwood.Http
             return true;
         }
 
+        public static bool TryCreate(byte[] rowVersion, out string eTag)
+        {
+            if (rowVersion == null)
+                throw new ArgumentNullException("rowVersion");
+
+
+            eTag = null;
+            if (rowVersion != null)
+            {
+                eTag = BitHelper.ConvertToHex(rowVersion);
+            }
+            return eTag != null;
+        }
+
         public static bool TryCreate(IRowVersion rowVersion, out string eTag)
         {
             if (rowVersion == null)

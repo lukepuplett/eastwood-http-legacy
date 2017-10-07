@@ -35,10 +35,15 @@ namespace Eastwood.Http
         public static readonly PreconditionResult PreconditionPassed = new PreconditionResult(0, null, PreconditionResultStatus.Passed);
 
         /// <summary>
-        /// A standard result to indicate a 412 precondition failed response should be given.
+        /// A standard result to indicate a 412 Precondition Failed response should be given.
         /// </summary>
-        public static readonly PreconditionResult PreconditionFailed = new PreconditionResult(StatusCodes.Status412PreconditionFailed, "Precondition failed", PreconditionResultStatus.Failed);
-        
+        public static readonly PreconditionResult PreconditionFailed = new PreconditionResult(StatusCodes.Status412PreconditionFailed, "Precondition Failed", PreconditionResultStatus.Failed);
+
+        /// <summary>
+        /// A standard result to indicate a 304 Not Modified should be given.
+        /// </summary>
+        public static readonly PreconditionResult PreconditionFailedNotModified = new PreconditionResult(StatusCodes.Status304NotModified, "Not Modified", PreconditionResultStatus.Failed);
+
         /// <summary>
         /// A standard result to indicate a 428 precondition required response should be given.
         /// </summary>

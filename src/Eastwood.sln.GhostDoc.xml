@@ -15,6 +15,7 @@
   <HelpConfiguration name="HelpFile">
     <OutputPath>.\Help</OutputPath>
     <CleanupOutputPath>true</CleanupOutputPath>
+    <HelpFileNamingMethod>MemberName</HelpFileNamingMethod>
     <ImageFolderPath />
     <HtmlFormats>
       <HtmlHelp>true</HtmlHelp>

@@ -14,7 +14,10 @@ namespace Eastwood.Http
     public class HttpPreconditionBuilder
     {
         private static readonly string[] ReadMethods = { HttpMethods.Get, HttpMethods.Connect, HttpMethods.Options, HttpMethods.Trace, HttpMethods.Head };
-        private static ILogger _logger;
+        private ILogger _logger;
+        private ILoggerFactory _loggerFactory;
+
+        //
 
         protected HttpPreconditionBuilder() { }
 
@@ -23,7 +26,7 @@ namespace Eastwood.Http
         /// </summary>
         /// <param name="httpContext">The HTTP context.</param>
         /// <exception cref="System.ArgumentNullException">request</exception>
-        public HttpPreconditionBuilder(Microsoft.AspNetCore.Http.HttpContext httpContext)
+        public HttpPreconditionBuilder(HttpContext httpContext)
         {
             if (httpContext == null)
             {
@@ -37,39 +40,15 @@ namespace Eastwood.Http
 
 
             this.InitializeLog(httpContext.RequestServices);
-
-            this.HttpRequest = httpContext.Request;
-
-            this.HttpRequestHeaders = this.HttpRequest.GetTypedHeaders();
-
-            this.IsMutation = IsMutatingMethod(this.HttpRequest.Method);
+            this.InitializePreconditionExecutor(httpContext.RequestServices);
         }
 
-        private void InitializeLog(IServiceProvider serviceProvider)
-        {
-            var factory = serviceProvider?.GetService(typeof(ILoggerFactory)) as ILoggerFactory;
-            {
-                _logger = factory?.CreateLogger<HttpPreconditionBuilder>();
-            }
-        }
+        //
 
         /// <summary>
-        /// Gets the HTTP request.
+        /// Gets or sets the precondition executor.
         /// </summary>
-        /// <value>The HTTP request.</value>
-        public HttpRequest HttpRequest { get; }
-
-        /// <summary>
-        /// Gets the HTTP request headers.
-        /// </summary>
-        /// <value>The HTTP request headers.</value>
-        public RequestHeaders HttpRequestHeaders { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the current request is a mutation.
-        /// </summary>
-        /// <value><c>true</c> if this instance is mutation; otherwise, <c>false</c>.</value>
-        public bool IsMutation { get; }
+        protected HttpPreconditionExecutor PreconditionExecutor { get; set; }
 
         /// <summary>
         /// Determines whether the specified HTTP method name is changes server-side state.
@@ -85,6 +64,8 @@ namespace Eastwood.Http
             return !ReadMethods.Contains(httpMethodName);
         }
 
+        //
+
         /// <summary>
         /// Determines the best default precondition behavior for the HTTP method.
         /// </summary>
@@ -94,13 +75,13 @@ namespace Eastwood.Http
         /// <param name="httpMethod">The HTTP method.</param>
         /// <returns>A behavior</returns>
         /// <exception cref="System.ArgumentNullException">httpMethod</exception>
-        public virtual PreconditionResult DefaultPreconditionResultForMethod(string httpMethod)
+        public static PreconditionResult DefaultPreconditionResultForMethod(string httpMethod)
         {
             if (httpMethod == null)
                 throw new ArgumentNullException("httpMethod");
 
 
-            if (ReadMethods.Contains(httpMethod))
+            if (!IsMutatingMethod(httpMethod))
             {
                 // Reads pass the precondition and response with full payload.
 
@@ -117,11 +98,16 @@ namespace Eastwood.Http
         /// <summary>
         /// Builds a precondition, choosing the appropriate default response for the HTTP method in the request.
         /// </summary>
-        public Func<IPreconditionInformation, PreconditionResult> BuildPrecondition()
+        public Func<IPreconditionInformation, PreconditionResult> BuildPrecondition(HttpRequest request)
         {
-            var b = this.DefaultPreconditionResultForMethod(this.HttpRequest.Method);
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
-            return this.BuildPrecondition(b);
+            var defaultResult = DefaultPreconditionResultForMethod(request.Method);
+
+            return this.BuildPrecondition(request, defaultResult);
         }
 
         /// <summary>
@@ -130,200 +116,41 @@ namespace Eastwood.Http
         /// <param name="defaultResult">The default result should the requisite headers not be present; usually a reads should pass and writes should fail.</param>
         /// <exception cref="System.InvalidOperationException">Cannot execute method. The required property Request is a null reference.</exception>
         /// <exception cref="System.NotSupportedException">Unable to build a predicate for the request. The HTTP method is not supported.</exception>
-        public virtual Func<IPreconditionInformation, PreconditionResult> BuildPrecondition(PreconditionResult defaultResult)
+        public virtual Func<IPreconditionInformation, PreconditionResult> BuildPrecondition(HttpRequest request, PreconditionResult defaultResult)
         {
-            if (this.IsMutation)
+            if (request == null)
             {
-                return this.GetPredicateForMutating(defaultResult);
+                throw new ArgumentNullException(nameof(request));
             }
-            else
-            {
-                return this.GetPredicateForNonMutating(defaultResult);
-            }
-        }
 
-        private Func<IPreconditionInformation, PreconditionResult> GetPredicateForMutating(PreconditionResult defaultResult)
-        {
             return new Func<IPreconditionInformation, PreconditionResult>(serverSideInfo =>
             {
-                return this.GetResultForMutating(defaultResult, serverSideInfo);
+                return this.PreconditionExecutor.GetResult(request, defaultResult, serverSideInfo);
             });
         }
-
-        private Func<IPreconditionInformation, PreconditionResult> GetPredicateForNonMutating(PreconditionResult defaultResult)
-        {
-            return new Func<IPreconditionInformation, PreconditionResult>(serverSideInfo =>
-            {
-                return this.GetResultForNonMutating(defaultResult, serverSideInfo);
-            });
-        }
-
-        private PreconditionResult GetResultForNonMutating(PreconditionResult defaultResult, IPreconditionInformation localInformation)
-        {
-            // Predicate code.
-
-            string localETag;
-            if (ETagUtility.TryCreate(localInformation, out localETag))
-            {
-                localETag = ETagUtility.FormatStandard(localETag);
-
-                // Favours eTags over timestamps.
-                //
-                if (this.HttpRequestHeaders.IfNoneMatch != null && this.HttpRequestHeaders.IfNoneMatch.Any())
-                {
-                    foreach (var eTag in this.HttpRequestHeaders.IfNoneMatch)
-                    {
-                        if (eTag.Tag == localETag)
-                        {
-                            this.LogInfo("Precondition If-None-Match: false");
-
-                            return PreconditionResult.PreconditionFailed; // As soon as one matches, we've failed (if *none* match).
-                        }
-                    }
-
-                    this.LogInfo("Precondition If-None-Match: true");
-
-                    return PreconditionResult.PreconditionPassed;
-                }
-
-                // Falls through to try modified stamps.
-                //
-                if (this.HttpRequestHeaders.IfModifiedSince.HasValue && localInformation.ModifiedOn > DateTimeOffset.MinValue)
-                {
-                    DateTimeOffset clientTimestamp = this.HttpRequestHeaders.IfModifiedSince.Value;
-
-                    if (IsTimeSignificantlyGreaterThan(clientTimestamp, localInformation.ModifiedOn))
-                    {
-                        this.LogInfo("Precondition If-Modified-Since: true");
-
-                        return PreconditionResult.PreconditionPassed;
-                    }
-                    else
-                    {
-                        this.LogInfo("Precondition If-Modified-Since: false");
-
-                        return PreconditionResult.PreconditionFailed;
-                    }
-                }
-
-                this.LogInfo("Precondition headers not found: " + defaultResult.ToString());
-            }
-            else
-            {
-                this.LogInfo("Local version data not found: " + defaultResult.ToString());
-            }
-
-            this.LogDefaultUsed(defaultResult);
-
-            return defaultResult;
-        }
-
-        private PreconditionResult GetResultForMutating(PreconditionResult defaultResult, IPreconditionInformation serverSideInfo)
-        {
-            // Predicate code.
-
-            string serverTag;
-            if (ETagUtility.TryCreate(serverSideInfo, out serverTag))
-            {
-                serverTag = ETagUtility.FormatStandard(serverTag);
-
-                // Favours eTags over timestamps.
-                //
-                if (this.HttpRequestHeaders.IfMatch != null && this.HttpRequestHeaders.IfMatch.Any())
-                {
-                    foreach (var eTag in this.HttpRequestHeaders.IfMatch)
-                    {
-                        if (eTag.Tag == "*")
-                            throw new NotSupportedException("The wildcard ETag conditional PUT|DELETE is not supported.");
-
-                        if (eTag.Tag == serverTag)
-                        {
-                            this.LogInfo("Precondition If-Match: true");
-
-                            return PreconditionResult.PreconditionPassed;
-                        }
-                    }
-
-                    this.LogInfo("Precondition If-Match: false");
-
-                    return PreconditionResult.PreconditionFailed;
-                }
-
-                if (this.HttpRequestHeaders.IfNoneMatch != null && this.HttpRequestHeaders.IfNoneMatch.Any())
-                {
-                    foreach (var eTag in this.HttpRequestHeaders.IfNoneMatch)
-                    {
-                        if (eTag.Tag == "*")
-                            throw new NotSupportedException("The wildcard ETag conditional PUT|DELETE is not supported.");
-
-                        if (eTag.Tag == serverTag)
-                        {
-                            this.LogInfo("Precondition If-None-Match: false");
-
-                            return PreconditionResult.PreconditionFailed; // As soon as one matches, we've failed (if *none* match).
-                        }
-                    }
-
-                    this.LogInfo("Precondition If-None-Match: true");
-
-                    return PreconditionResult.PreconditionPassed;
-                }
-
-                // Falls through to try modified stamps, note: *Un*modified since.
-                //
-                if (this.HttpRequestHeaders.IfUnmodifiedSince.HasValue && serverSideInfo.ModifiedOn > DateTimeOffset.MinValue)
-                {
-                    DateTimeOffset clientTimestamp = this.HttpRequestHeaders.IfUnmodifiedSince.Value;
-
-                    // Pass, only if the server resource has not been modified since the specified date/time, i.e. if the timestamp
-                    // on the server's copy matches that which the client has.
-                    //
-                    if (AreTimesAlmostEqual(clientTimestamp, serverSideInfo.ModifiedOn))
-                    {
-                        this.LogInfo("Precondition If-Unmodified-Since: true");
-
-                        return PreconditionResult.PreconditionPassed;
-                    }
-                    else
-                    {
-                        this.LogInfo("Precondition If-Unmodified-Since: false");
-
-                        return PreconditionResult.PreconditionFailed;
-                    }
-                }
-
-                this.LogInfo("Precondition headers not found: " + defaultResult.ToString());
-            }
-            else
-            {
-                this.LogInfo("Local version data not found: " + defaultResult.ToString());
-            }
-
-            this.LogDefaultUsed(defaultResult);
-
-            return defaultResult;
-        }
-
-        private void LogDefaultUsed(PreconditionResult defaultResult)
-        {
-            this.LogInfo("The information required to determine precondition is not present. Defaulting to HTTP " + defaultResult.StatusCode);
-        }
-
-        private static bool IsTimeSignificantlyGreaterThan(DateTimeOffset baseOffset, DateTimeOffset possiblyGreater)
-        {
-            TimeSpan difference = possiblyGreater - baseOffset;
-            return difference.TotalMilliseconds > 1000;
-        }
-
-        private static bool AreTimesAlmostEqual(DateTimeOffset offset, DateTimeOffset dateTime)
-        {
-            TimeSpan difference = offset - dateTime;
-            return Math.Abs(difference.TotalMilliseconds) < 1000;
-        }
-
+        
         protected virtual void LogInfo(string message)
         {
             _logger?.LogInformation(message);
         }
+        
+        private void InitializePreconditionExecutor(IServiceProvider serviceProvider)
+        {
+            this.PreconditionExecutor = 
+                this.PreconditionExecutor 
+                ?? (
+                    (HttpPreconditionExecutor)serviceProvider?.GetService(typeof(HttpPreconditionExecutor)) 
+                    ?? new HttpPreconditionExecutor(_loggerFactory)
+                    );
+        }
+
+        private void InitializeLog(IServiceProvider serviceProvider)
+        {
+            _loggerFactory = serviceProvider?.GetService(typeof(ILoggerFactory)) as ILoggerFactory;
+            {
+                _logger = _loggerFactory?.CreateLogger<HttpPreconditionBuilder>();
+            }
+        }
+
     }
 }

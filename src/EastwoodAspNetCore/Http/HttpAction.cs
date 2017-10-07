@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Net.Http.Headers;
+using System.Collections.Generic;
 
 namespace Eastwood.Http
 {
@@ -30,8 +32,10 @@ namespace Eastwood.Http
     /// <seealso cref="System.Web.Http.IHttpActionResult" />
     public abstract class HttpAction : IActionResult
     {
-        private readonly Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool> _loggingFunction;
-        private readonly Func<object, Exception, string> _loggingFormatter;
+        private Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool> _loggingFunction;
+        private Func<object, Exception, string> _loggingFormatter;
+
+        //
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpAction"/> class.
@@ -61,10 +65,9 @@ namespace Eastwood.Http
 
             this.ActionOptions = initializationContext.ActionOptions;
             this.Instrumentation = initializationContext.Instrumentation;
-
-            _loggingFunction = this.Instrumentation.GetLogger(this.FormatLoggerName());
-            _loggingFormatter = this.Instrumentation.FormatMessage;
         }
+
+        //
 
         /// <summary>
         /// Gets the action options.
@@ -76,51 +79,34 @@ namespace Eastwood.Http
         /// </summary>
         public InstrumentationContext Instrumentation { get; private set; }
 
-        /// <summary>
-        /// Gets the action context.
-        /// </summary>
-        /// <value>
-        /// The action context.
-        /// </value>
-        protected internal ActionContext ActionContext { get; set; }
-
-        /// <summary>
-        /// Gets the HTTP context.
-        /// </summary>
-        protected HttpContext HttpContext { get => this.ActionContext?.HttpContext; }
-
-        /// <summary>
-        /// Gets the HTTP request.
-        /// </summary>
-        protected HttpRequest Request { get => this.HttpContext?.Request; }
-
-        /// <summary>
-        /// Gets the cancellation token.
-        /// </summary>
-        protected CancellationToken CancellationToken { get => this.HttpContext?.RequestAborted ?? CancellationToken.None; }
+        //
 
         /// <summary>
         /// Called by the WebAPI framework to execute the action and get a response.
         /// </summary>
+        /// <param name="actionContext"></param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>
         /// A task that, when completed, contains the <see cref="T:System.Net.Http.HttpResponseMessage" />.
         /// </returns>
-        public virtual async Task ExecuteResultAsync(ActionContext actionContext)
+        public async Task ExecuteResultAsync(ActionContext actionContext)
         {
-            this.ActionContext = actionContext ?? this.ActionContext;
+            if (actionContext == null)
+            {
+                throw new ArgumentNullException("Cannot execute the action. No ActionContext is available from which to form a response.");
+            }
 
-            if (this.ActionContext == null)
-                throw new InvalidOperationException("Cannot execute the action. No ActionContext is available from which to form a response.");
 
+            var cancellationToken = actionContext.HttpContext.RequestAborted;
+            cancellationToken.ThrowIfCancellationRequested();
 
-            this.CancellationToken.ThrowIfCancellationRequested();
+            this.InitializeLogging(actionContext);
 
             this.Log(TraceEventType.Verbose, "Executing action.");
 
-            if (this.ActionOptions.EnableInvalidModelStateResponder && !this.ActionContext.ModelState.IsValid)
+            if (this.ActionOptions.EnableInvalidModelStateResponder && !actionContext.ModelState.IsValid)
             {
-                await this.RespondWithModelStateErrorResponseAsync();
+                await this.RespondWithModelStateErrorResponseAsync(actionContext);
             }
             else
             {
@@ -128,60 +114,60 @@ namespace Eastwood.Http
                 {
                     this.Log(TraceEventType.Verbose, "Attempting to get local precondition information.");
 
-                    var (hasResult, information) = await this.TryGetLocalConditionInfoAsync(this.CancellationToken);
+                    var (hasResult, information) = await this.TryGetLocalConditionInfoAsync(actionContext, cancellationToken);
 
-                    this.CancellationToken.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     if (hasResult)
                     {
                         // Local information was returned which indicates that concurrency and versioning is enabled for this action.
 
-                        var preconditionResult = this.ExecutePrecondition(information);
+                        var preconditionResult = this.ExecutePrecondition(actionContext, information);
 
                         if (preconditionResult.Status == PreconditionResultStatus.Passed)
                         {
                             this.Log(TraceEventType.Verbose, "Precondition passed, continuing execution.");
 
-                            await this.ExecuteActionAsync();
+                            await this.ExecuteActionAsync(actionContext, cancellationToken);
                         }
                         else
                         {
                             this.Log(TraceEventType.Verbose, $"Precondition failed, responding HTTP {preconditionResult.StatusCode}.");
 
-                            await this.RespondWithAsync(preconditionResult.StatusCode, preconditionResult.ReasonPhrase);                            
+                            await actionContext.ExecuteWithAsync(preconditionResult.StatusCode, preconditionResult.ReasonPhrase);
                         }
                     }
                     else
                     {
                         this.Log(TraceEventType.Verbose, "No local precondition information. Action does not support preconditions, continuing execution.");
 
-                        await this.ExecuteActionAsync();
+                        await this.ExecuteActionAsync(actionContext, cancellationToken);
                     }
                 }
                 else
                 {
-                    await this.ExecuteActionAsync();
+                    await this.ExecuteActionAsync(actionContext, cancellationToken);
                 }
             }
         }
 
-        private PreconditionResult ExecutePrecondition(IPreconditionInformation information)
+        private PreconditionResult ExecutePrecondition(ActionContext actionContext, IPreconditionInformation information)
         {
-            var preconditionBuilder = new HttpPreconditionBuilder(this.HttpContext);
-            var getResult = preconditionBuilder.BuildPrecondition(this.ActionOptions.MissingPreconditionResult);
+            var preconditionBuilder = new HttpPreconditionBuilder(actionContext.HttpContext);
+            var getResult = preconditionBuilder.BuildPrecondition(actionContext.HttpContext.Request, this.ActionOptions.MissingPreconditionResult);
 
             this.Log(TraceEventType.Verbose, "Executing precondition.");
 
             return getResult(information);
         }
 
-        private Task RespondWithModelStateErrorResponseAsync()
+        private Task RespondWithModelStateErrorResponseAsync(ActionContext actionContext)
         {
-            var modelStateErrors = String.Join(" ", this.ActionContext.ModelState.Values.SelectMany(m => m.Errors).Select(e => e.ErrorMessage));
+            var modelStateErrors = String.Join(" ", actionContext.ModelState.Values.SelectMany(m => m.Errors).Select(e => e.ErrorMessage));
 
             this.Log(TraceEventType.Information, "Model state is invalid. " + modelStateErrors);
 
-            return this.RespondWithAsync(this.ActionOptions.InvalidModelStatus, this.ActionContext.ModelState);
+            return actionContext.ExecuteWithAsync(this.ActionOptions.InvalidModelStatus, actionContext.ModelState);
         }
 
         /// <summary>
@@ -189,7 +175,7 @@ namespace Eastwood.Http
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>An attempt object that may or may not contain local information.</returns>
-        protected virtual Task<(bool, IPreconditionInformation)> TryGetLocalConditionInfoAsync(CancellationToken cancellationToken)
+        protected virtual Task<(bool, IPreconditionInformation)> TryGetLocalConditionInfoAsync(ActionContext actionContext, CancellationToken cancellationToken)
         {
             var tuple = new Tuple<bool, IPreconditionInformation>(false, null).ToValueTuple();
 
@@ -201,7 +187,7 @@ namespace Eastwood.Http
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        protected abstract Task ExecuteActionAsync();
+        protected abstract Task ExecuteActionAsync(ActionContext actionContext, CancellationToken cancellationToken);
 
         /// <summary>
         /// Logs a message to the logging implementation.
@@ -212,112 +198,19 @@ namespace Eastwood.Http
         {
             _loggingFunction?.Invoke(eventType, 0, message, exception, _loggingFormatter);
         }
-        
-        /// <summary>
-        /// Responds to the request and executes the action..
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="statusCode">The status code.</param>
-        /// <param name="content">The content.</param>
-        /// <returns>A new HttpResponseMessage</returns>
-        protected Task RespondWithAsync(int statusCode)
+
+        //
+
+        private void InitializeLogging(ActionContext actionContext)
         {
-            return new StatusCodeResult((int)statusCode).ExecuteResultAsync(this.ActionContext);
+            _loggingFunction = this.Instrumentation.GetLogger(this.FormatLoggerName(actionContext));
+            _loggingFormatter = this.Instrumentation.FormatMessage;
         }
 
-        /// <summary>
-        /// Responds to the request and executes the action..
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="statusCode">The status code.</param>
-        /// <param name="content">The content.</param>
-        /// <returns>A new HttpResponseMessage</returns>
-        protected Task RespondWithAsync<T>(int statusCode, T content)
+        private string FormatLoggerName(ActionContext actionContext)
         {
-            var objectResult = new ObjectResult(content) { StatusCode = (int)statusCode };
-
-            return objectResult.ExecuteResultAsync(this.ActionContext);
+            return String.Concat(this.GetType().Name, "[", actionContext.ActionDescriptor.DisplayName, "]");
         }
 
-        /// <summary>
-        /// Responds to the request and executes the action.
-        /// </summary>
-        /// <param name="statusCode">The status code.</param>
-        /// <param name="message">The message.</param>
-        /// <returns>HttpResponseMessage.</returns>
-        protected Task RespondWithAsync(int statusCode, string message, string contentType = "text/plain")
-        {
-            var contentResult = new ContentResult()
-            {
-                StatusCode = (int)statusCode,
-                ContentType = contentType,
-                Content = message
-            };
-
-            return contentResult.ExecuteResultAsync(this.ActionContext);
-        }
-
-        /// <summary>
-        /// Responds to the request and executes the action.
-        /// </summary>
-        /// <param name="statusCode">The status code.</param>
-        /// <param name="modelState">State of the model.</param>
-        /// <returns>HttpResponseMessage.</returns>
-        /// <exception cref="System.ArgumentOutOfRangeException"></exception>
-        protected Task RespondWithAsync(int statusCode, ModelStateDictionary modelState)
-        {
-            if (modelState == null)
-                throw new ArgumentNullException("modelState");
-
-            var badness = new BadRequestObjectResult(modelState)
-            {
-                StatusCode = (int)statusCode
-            };
-
-            return badness.ExecuteResultAsync(this.ActionContext);
-        }
-
-        /// <summary>
-        /// Responds to the request and executes the action.
-        /// </summary>
-        /// <param name="statusCode">The status code.</param>
-        /// <param name="error">The error.</param>
-        /// <returns>HttpResponseMessage.</returns>
-        /// <exception cref="System.ArgumentOutOfRangeException"></exception>
-        protected Task RespondWithAsync(int statusCode, SerializableError error)
-        {
-            if (error == null)
-                throw new ArgumentNullException("error");
-
-            var badness = new BadRequestObjectResult(error)
-            {
-                StatusCode = (int)statusCode
-            };
-
-            return badness.ExecuteResultAsync(this.ActionContext);
-        }
-
-        /// <summary>
-        /// Responds to the request and executes the action.
-        /// </summary>
-        /// <param name="statusCode">The status code.</param>
-        /// <param name="exception">The exception.</param>
-        /// <returns>HttpResponseMessage.</returns>
-        /// <exception cref="System.ArgumentOutOfRangeException"></exception>
-        protected Task RespondWithAsync(int statusCode, Exception exception)
-        {
-            if (exception == null)
-                throw new ArgumentNullException("exception");
-
-
-            return this.RespondWithAsync(statusCode, $"{exception.GetType().Name} '{exception.Message}'");
-        }
-
-        // Privates
-
-        private string FormatLoggerName()
-        {
-            return String.Concat(this.GetType().Name, "[", this.ActionContext.ActionDescriptor.DisplayName, "]");
-        }
     }
 }
